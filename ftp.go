@@ -29,6 +29,7 @@ type ServerConn struct {
 	host     string
 	timeout  time.Duration
 	features map[string]string
+	Passive  bool
 }
 
 // Entry describes a file and is returned by List().
@@ -218,7 +219,7 @@ func (c *ServerConn) openDataConn() (net.Conn, error) {
 	//  else -> PASV
 	_, nat6Supported := c.features["nat6"]
 	_, epsvSupported := c.features["EPSV"]
-	if nat6Supported || epsvSupported {
+	if !c.Passive && (nat6Supported || epsvSupported) {
 		port, err = c.epsv()
 		if err != nil {
 			return nil, err
